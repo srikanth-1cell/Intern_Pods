@@ -1,29 +1,4 @@
-# Product Requirements Document (PRD)
-
 # Personal LLM Wiki (Karpathy-Style Knowledge Compiler)
-
-
-# Resources
-
-- Andrej Karpathy — Personal LLM Wiki Concept  
-  https://x.com/karpathy/status/2039805659525644595
-
-- MindStudio Blog — Building a Personal LLM Wiki  
-  https://www.mindstudio.ai/blog/andrej-karpathy-llm-wiki-knowledge-base-claude-code#main-content
-
-- Data Science Dojo — LLM Wiki Tutorial  
-  https://datasciencedojo.com/blog/llm-wiki-tutorial/
-
-- YouTube — Personal LLM Wiki Walkthrough  
-  https://www.youtube.com/watch?v=4SB3T1reCHw
-
-- YouTube — Building AI Knowledge Systems  
-  https://www.youtube.com/watch?v=it8v6GNxBDI&t=79s
-
-- YouTube — Karpathy-Style Knowledge Compilation Concepts  
-  https://www.youtube.com/watch?v=l4EzuMKmeA0
-
-
 
 ## Team Members
 
@@ -35,410 +10,180 @@
 
 ---
 
-# 1. Project Overview
+# Project Overview
 
-The goal of this project is to build a lightweight AI-powered knowledge compilation system that converts long-form content (primarily videos) into a continuously improving Markdown wiki.
+This project is about building a lightweight AI-powered knowledge compilation system that converts long-form content such as videos into a continuously improving Markdown wiki. The system should process information during ingestion time and transform raw transcripts into structured concept pages that can evolve over time.
 
-The system should process knowledge during ingestion time instead of relying entirely on query-time retrieval.
+The core idea is that the AI should not simply answer questions directly from raw transcripts. Instead, it should gradually build and improve a persistent knowledge base in Markdown format. As more videos are processed, the wiki should become cleaner, more connected, and more useful.
 
-The final output should be:
-
-* human-readable
-* Markdown-native
-* searchable
-* interlinked
-
-The project is intentionally designed as:
-
-* an AI experimentation project
-* a workflow orchestration project
-* a hands-on learning experience
-
-This is not intended to be an enterprise SaaS application.
+The final output of the project should primarily be a folder of Markdown files that are human-readable, searchable, and interlinked using wiki-style references.
 
 ---
 
-# 2. Project Objective
+# System Workflow
 
-Build a system where:
+The system should support a simple end-to-end workflow where a user drops a video into a `/raw` folder and the application automatically processes it.
 
-```text id="vk0ucw"
-Video → Transcript → AI Compilation → Markdown Wiki
-```
+The workflow should look like this:
 
-The AI system should:
-
-* extract important concepts
-* generate concept pages
-* update existing pages
-* connect related ideas
-* improve summaries over time
-
-The wiki should behave like a growing knowledge base.
-
----
-
-# 3. Core Product Philosophy
-
-## Key Idea
-
-Instead of:
-
-* repeatedly searching raw documents with RAG
-
-We:
-
-* compile knowledge once
-* store structured Markdown pages
-* continuously refine the knowledge base
-
-The Markdown wiki itself is the main product.
-
-The application/UI is only a way to browse and interact with it.
-
----
-
-# 4. Goals
-
-## Primary Goals
-
-* Automatically transcribe uploaded videos
-* Generate structured Markdown concept pages
-* Create links between related concepts
-* Update knowledge incrementally
-* Allow users to browse and search the wiki
-* Enable AI chat over compiled knowledge
-
----
-
-## Secondary Goals
-
-* Experiment with prompt engineering
-* Learn AI orchestration workflows
-* Explore knowledge compilation concepts
-* Learn modern AI developer tooling
-
----
-
-# 5. Non-Goals
-
-The following are intentionally out of scope:
-
-* Enterprise authentication systems
-* Production-grade scalability
-* Complex backend infrastructure
-* Heavy DevOps workflows
-* Large database systems
-
-This project should remain lightweight and experimentation-focused.
-
----
-
-# 6. High-Level Workflow
-
-## End-to-End Pipeline
-
-```text id="iggrjd"
+```text
 /raw/video.mp4
     ↓
-Transcription
+Transcript Generation
     ↓
 Transcript Processing
     ↓
 AI Compilation
     ↓
 Markdown Wiki Pages
-    ↓
-Search / Chat / Browsing
 ```
 
----
+Once transcripts are generated, the AI system should analyze the transcript, identify important concepts, compare them against existing wiki pages, and either create new pages or update existing ones.
 
-# 7. Functional Requirements
-
-# 7.1 Video Ingestion
-
-## Owner: Tejas
-
-### Requirements
-
-The system should:
-
-* monitor a `/raw` folder
-* detect newly added video files
-* process videos automatically
+Over time, the wiki should behave like a growing knowledge garden where concepts become more refined and better connected.
 
 ---
 
-### Supported Inputs
+# Video Ingestion and Transcription
 
-Initially support:
+Tejas will primarily focus on the ingestion and transcription workflow. The system should monitor a `/raw` folder and automatically detect newly added video files such as `.mp4` or `.mov`.
 
-* `.mp4`
-* `.mov`
+Once a video is detected, the system should generate a transcript using Whisper or another suitable transcription model. The generated transcript should be stored inside a `/transcripts` folder in Markdown or plain text format.
 
-Optional later support:
+Where possible, transcripts should preserve timestamps so that later stages of the system can reference exact portions of the source material.
 
-* YouTube URLs
-* audio-only files
-* PDFs
+The ingestion pipeline does not need to be production-grade. The priority is to build a workflow that works reliably for experimentation and iteration.
 
 ---
 
-### Output
+# AI Compilation Engine
 
-Generated transcript files should be stored in:
+Esha will primarily focus on the AI compilation workflow, which is the core of this project.
 
-```text id="8oh0wo"
-/transcripts
-```
+The compilation engine should read transcript content and inspect the existing Markdown wiki before generating output. Instead of blindly creating new pages every time, the AI should decide whether a concept already exists and whether an existing page should be updated.
 
----
+For example, if one transcript discusses “Photosynthesis” and a later transcript discusses “How Plants Convert Sunlight Into Energy,” the AI should attempt to recognize that these concepts are related and consolidate the information appropriately.
 
-# 7.2 Transcription Pipeline
+The AI should continuously improve pages by:
 
-## Owner: Tejas
+* refining summaries
+* adding missing details
+* creating links between related concepts
+* reducing duplication
+* maintaining consistent terminology
 
-### Requirements
-
-The system should:
-
-* generate transcripts from uploaded videos
-* support long-form videos
-* preserve timestamps if possible
+The overall objective is to simulate how a human might gradually build and refine a personal knowledge base over time.
 
 ---
 
-### Recommended Tools
+# Markdown Wiki Structure
 
-Suggested options:
+The wiki itself is the primary output of this project. Every important concept extracted from transcripts should become a Markdown page stored inside the `/wiki` directory.
 
-* Whisper API
-* local Whisper models
+Each page should remain concise, readable, and focused on a single concept. Pages should include:
 
----
-
-### Output Format
+* a title
+* a short TLDR summary
+* a main explanation section
+* links to related concepts
 
 Example:
 
-```md id="khy4b3"
-# Video Transcript
-
-Source: ai-talk.mp4
-
-[00:01:20]
-Embeddings are vector representations...
-```
-
+```md
 ---
-
-# 7.3 AI Compilation Engine
-
-## Owner: Esha
-
-### Overview
-
-This is the core feature of the project.
-
-The AI compilation engine should:
-
-1. Read transcript content
-2. Inspect existing wiki pages
-3. Decide whether to:
-
-   * create a new page
-   * update an existing page
-   * merge related concepts
-4. Write Markdown output
-
----
-
-### Example Workflow
-
-Transcript says:
-
-```text id="8rtnr0"
-RAG systems use embeddings for semantic retrieval.
-```
-
-The AI may:
-
-* update `rag.md`
-* update `embeddings.md`
-* add wiki links
-
----
-
-### Requirements
-
-The system should:
-
-* avoid duplicate pages
-* maintain consistent terminology
-* create concise summaries
-* connect related concepts
-
----
-
-# 7.4 Markdown Wiki Generation
-
-## Owner: Esha
-
-### Requirements
-
-Each concept should become a Markdown page.
-
----
-
-### Example Structure
-
-```md id="r5y4ea"
----
-title: Embeddings
+title: Photosynthesis
 tags:
-  - ai
-  - rag
+  - biology
+  - plants
 ---
 
 TLDR:
-Embeddings convert information into semantic vectors.
+Photosynthesis is the process plants use to convert sunlight into chemical energy.
 
 # Overview
 
+Photosynthesis allows plants to use sunlight, water, and carbon dioxide to produce glucose and oxygen. This process primarily occurs inside chloroplasts and is essential for sustaining life on Earth.
+
 # Related Concepts
 
-- [[Vector Databases]]
-- [[Semantic Search]]
+- [[Chloroplasts]]
+- [[Cellular Respiration]]
+- [[Plant Cells]]
 ```
 
----
-
-### Standards
-
-Every page should include:
-
-* title
-* short TLDR
-* main explanation
-* related concept links
+The wiki should remain readable even outside the application itself. The Markdown files should be usable independently in tools such as Obsidian or VS Code.
 
 ---
 
-# 7.5 Wiki Linking
+# Wiki Linking and Knowledge Connections
 
-## Owners: Esha + Siddhu
+The system should support wiki-style linking using the `[[Concept Name]]` format. As the AI generates or updates pages, it should attempt to create useful relationships between concepts.
 
-### Requirements
+For example:
 
-The system should:
-
-* support `[[wiki-links]]`
-* connect related concepts automatically
-* generate backlinks where possible
-
----
-
-### Example
-
-```text id="3yotk3"
-[[Embeddings]]
-[[RAG]]
-[[Semantic Search]]
+```text
+[[Photosynthesis]]
+[[Chloroplasts]]
+[[Plant Cells]]
 ```
 
+These links should help the knowledge base become increasingly interconnected over time. Siddhu and Esha should collaborate on making sure these wiki links work correctly both in generated Markdown and in the frontend viewer.
+
 ---
 
-# 7.6 Wiki Browser UI
+# Wiki Browser and Frontend Experience
 
-## Owner: Siddhu
+Siddhu will primarily focus on the browsing experience and frontend interface.
 
-### Requirements
-
-Build a lightweight UI that supports:
+The frontend should provide a lightweight interface for exploring the Markdown wiki. At minimum, the interface should support:
 
 * sidebar navigation
 * Markdown rendering
-* page browsing
-* search
+* clickable wiki links
+* search functionality
 
----
+The interface should feel similar to a lightweight Obsidian-style knowledge browser.
 
-### Suggested Stack
+The frontend does not need complex authentication or backend infrastructure. The focus should remain on simplicity and usability.
+
+Suggested technologies include:
 
 * Next.js
+* Tailwind CSS
 * Shadcn UI
-* Tailwind
+
+Optional enhancements may include:
+
+* graph visualization
+* backlinks
+* dark mode
+* concept relationship views
 
 ---
 
-# 7.7 Search
+# Search and Chat Experience
 
-## Owners: Siddhu + Esha
+The application should support a simple search and chat experience over the generated wiki.
 
-### Requirements
+Users should be able to search for concepts and browse relevant pages. Siddhu and Esha should also experiment with an AI chat interface where the model answers questions using the generated Markdown wiki as context.
 
-Users should be able to:
+For example, a user might ask:
 
-* search concept names
-* search page contents
-
-Optional:
-
-* semantic/vector search
-
----
-
-# 7.8 AI Chat Interface
-
-## Owner: Siddhu
-
-### Requirements
-
-Users should be able to:
-
-* ask questions about the wiki
-* receive AI-generated answers
-* see referenced concept pages
-
----
-
-### Example
-
-Question:
-
-```text id="nchz1u"
-What do the videos say about RAG?
+```text
+What do the videos say about photosynthesis?
 ```
 
-Response should reference:
+The AI should respond using information synthesized from the wiki pages rather than directly querying raw transcripts.
 
-* relevant wiki pages
-* related concepts
-
----
-
-# 8. Technical Requirements
-
-# Recommended Stack
-
-| Area          | Suggested Technology |
-| ------------- | -------------------- |
-| Frontend      | Next.js              |
-| Styling       | Tailwind             |
-| UI Components | Shadcn UI            |
-| AI SDK        | Vercel AI SDK        |
-| Transcription | Whisper              |
-| Storage       | Markdown files       |
-| AI Provider   | OpenAI API           |
+The chat experience should reference relevant concepts and encourage exploration of the wiki itself.
 
 ---
 
-# 9. Folder Structure
+# Folder Structure
 
-## Recommended Structure
+The recommended project structure should remain simple and Markdown-centric.
 
-```text id="9nlf4v"
+```text
 /raw
 /transcripts
 /wiki
@@ -448,135 +193,77 @@ Response should reference:
 /components
 ```
 
----
-
-# 10. Team Responsibilities
-
-# Esha
-
-## AI Workflow + Coordination
-
-Responsibilities:
-
-* overall architecture
-* AI orchestration
-* prompt engineering
-* page update logic
-* concept merging
-* integration support
+The `/wiki` directory is the most important output of the project.
 
 ---
 
-# Tejas
+# Development Approach
 
-## Ingestion + Transcription
+This project should prioritize experimentation, iteration, and rapid learning. The goal is not to build enterprise software but to explore AI-native workflows and knowledge compilation systems.
 
-Responsibilities:
+The interns are encouraged to heavily use AI coding tools such as:
 
-* video ingestion
-* transcription pipeline
-* transcript cleanup
-* transcript chunking
+* Cursor
+* Claude
+* ChatGPT
+* GitHub Copilot
 
----
+The most important part of the project is learning how to:
 
-# Siddhu
+* orchestrate AI workflows
+* shape prompts
+* iteratively improve outputs
+* design useful knowledge structures
 
-## Wiki Experience + UI
-
-Responsibilities:
-
-* Markdown rendering
-* sidebar navigation
-* wiki links
-* search UI
-* chat interface
+The project should remain lightweight, practical, and enjoyable to build.
 
 ---
 
-# 11. Suggested Timeline
+# Suggested Timeline
 
-# Week 1
+During the first week, the team should focus on project setup, transcription generation, and initial Markdown generation.
 
-## Foundations
+During the second week, the focus should shift toward AI-driven concept extraction and wiki page generation.
 
-Goals:
+The third week should focus on improving linking, navigation, and Markdown rendering.
 
-* setup project
-* transcription working
-* basic Markdown generation
+The fourth week should focus on search, chat integration, and improving the overall knowledge compilation workflow.
 
----
-
-# Week 2
-
-## AI Compilation
-
-Goals:
-
-* concept extraction
-* wiki page generation
-* page updates
+Additional weeks can be used for experimentation, UI improvements, graph visualization, and refinement of prompts and page quality.
 
 ---
 
-# Week 3
+# Final Demonstration
 
-## Linking + Navigation
+At the end of the internship, the team should be able to demonstrate a workflow where:
 
-Goals:
+* a video is dropped into `/raw`
+* a transcript is generated automatically
+* the AI creates or updates wiki pages
+* concepts become linked together
+* users can browse and search the wiki
+* users can ask questions against the compiled knowledge base
 
-* wiki links
-* Markdown browsing
-* related concepts
-
----
-
-# Week 4
-
-## Search + Chat
-
-Goals:
-
-* search functionality
-* AI chat over wiki
-* source references
+The final system should demonstrate how AI can continuously build and refine a persistent Markdown-based knowledge system over time.
 
 ---
 
-# Week 5
+# Resources
 
-## Cleanup + Improvements
+* Andrej Karpathy — Personal LLM Wiki Concept
+  [https://x.com/karpathy/status/2039805659525644595](https://x.com/karpathy/status/2039805659525644595)
 
-Goals:
+* MindStudio Blog — Building a Personal LLM Wiki
+  [https://www.mindstudio.ai/blog/andrej-karpathy-llm-wiki-knowledge-base-claude-code#main-content](https://www.mindstudio.ai/blog/andrej-karpathy-llm-wiki-knowledge-base-claude-code#main-content)
 
-* better prompts
-* duplicate reduction
-* UI polish
+* Data Science Dojo — LLM Wiki Tutorial
+  [https://datasciencedojo.com/blog/llm-wiki-tutorial/](https://datasciencedojo.com/blog/llm-wiki-tutorial/)
 
----
+* YouTube — Personal LLM Wiki Walkthrough
+  [https://www.youtube.com/watch?v=4SB3T1reCHw](https://www.youtube.com/watch?v=4SB3T1reCHw)
 
-# 12. Success Criteria
+* YouTube — Building AI Knowledge Systems
+  [https://www.youtube.com/watch?v=it8v6GNxBDI&t=79s](https://www.youtube.com/watch?v=it8v6GNxBDI&t=79s)
 
-The project is considered successful if:
-
-* videos can be dropped into `/raw`
-* transcripts are automatically generated
-* AI creates useful Markdown pages
-* pages become interlinked
-* users can browse/search/chat with the wiki
-* the knowledge base improves incrementally over time
-
----
-
-# 13. Final Demo Expectations
-
-At the end of the internship, the team should demonstrate:
-
-1. Add video into `/raw`
-2. Generate transcript automatically
-3. AI creates/updates Markdown pages
-4. Wiki pages link together
-5. User browses/searches the wiki
-6. AI answers questions using the wiki
-7. Knowledge improves over time through compilation
+* YouTube — Karpathy-Style Knowledge Compilation Concepts
+  [https://www.youtube.com/watch?v=l4EzuMKmeA0](https://www.youtube.com/watch?v=l4EzuMKmeA0)
